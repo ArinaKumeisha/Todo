@@ -1,5 +1,7 @@
 import React, {ChangeEvent, KeyboardEvent, useState} from 'react';
 import {FilterValuesType} from './App';
+import Buttons from "./components/Button/Buttons";
+
 
 export type TaskType = {
     id: string
@@ -18,8 +20,7 @@ type PropsType = {
     filter: FilterValuesType
 }
 
-export function Todolist(props: PropsType) {
-
+export const Todolist = React.memo((props: PropsType) => {
     let [title, setTitle] = useState("")
     let [error, setError] = useState<string | null>(null)
 
@@ -31,22 +32,15 @@ export function Todolist(props: PropsType) {
             setError("Title is required");
         }
     }
-
     const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
         setTitle(e.currentTarget.value)
     }
-
     const onKeyPressHandler = (e: KeyboardEvent<HTMLInputElement>) => {
         setError(null);
         if (e.charCode === 13) {
             addTask();
         }
     }
-
-    const onAllClickHandler = () => props.changeFilter(props.todolistID, "all");
-    const onActiveClickHandler = () => props.changeFilter(props.todolistID, "active");
-    const onCompletedClickHandler = () => props.changeFilter(props.todolistID, "completed");
-
 
     return <div>
         <h3>{props.title}</h3>
@@ -66,7 +60,6 @@ export function Todolist(props: PropsType) {
                     const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
                         props.changeTaskStatus(t.id, e.currentTarget.checked, props.todolistID);
                     }
-
                     return <li key={t.id} className={t.isDone ? "is-done" : ""}>
                         <input type="checkbox"
                                onChange={onChangeHandler}
@@ -79,15 +72,21 @@ export function Todolist(props: PropsType) {
         </ul>
 
         <div>
-            <button className={props.filter === 'all' ? "active-filter" : ""}
-                    onClick={onAllClickHandler}>All
-            </button>
-            <button className={props.filter === 'active' ? "active-filter" : ""}
-                    onClick={onActiveClickHandler}>Active
-            </button>
-            <button className={props.filter === 'completed' ? "active-filter" : ""}
-                    onClick={onCompletedClickHandler}>Completed
-            </button>
+            <Buttons
+                name="all"
+                callback={props.changeFilter}
+                todolistID={props.todolistID}
+                filter={props.filter}/>
+            <Buttons
+                name="active"
+                callback={props.changeFilter}
+                todolistID={props.todolistID}
+                filter={props.filter}/>
+            <Buttons
+                name="completed"
+                callback={props.changeFilter}
+                todolistID={props.todolistID}
+                filter={props.filter}/>
         </div>
     </div>
-}
+})

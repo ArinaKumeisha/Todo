@@ -24,38 +24,39 @@ function App() {
             [todolistID1]: [
                 {id: v1(), title: "HTML&CSS", isDone: true},
                 {id: v1(), title: "JS", isDone: false},
+                {id: v1(), title: "JS", isDone: false},
             ],
             [todolistID2]: [
                 {id: v1(), title: "ReactJS", isDone: true},
                 {id: v1(), title: "Rest API", isDone: false},
+                {id: v1(), title: "GraphQL", isDone: false},
+                {id: v1(), title: "GraphQL", isDone: false},
                 {id: v1(), title: "GraphQL", isDone: false},
             ]
         }
     );
 
     function removeTask(id: string, todolistID: string) {
-        tasks[todolistID] = tasks[todolistID].filter(t => t.id !== id);
-        setTasks({...tasks});
+        // tasks[todolistID] = tasks[todolistID].filter(t => t.id !== id);
+        // setTasks({...tasks});
+        setTasks({...tasks, [todolistID]: tasks[todolistID].filter(t => t.id !== id)})
     }
 
     function addTask(title: string, todolistID: string) {
-        const newTask: TaskType = {
-            id: v1(),
-            title: title,
-            isDone: false
-        };
-        const copyTasks = {...tasks}
-        copyTasks[todolistID] = [newTask, ...tasks[todolistID]]
-        setTasks(copyTasks);
+        // const newTask: TaskType = {id: v1(), title: "GraphQL", isDone: false}
+        // const copy = {...tasks}
+        // copy[todolistID] = [newTask, ...tasks[todolistID]]
+        // setTasks({...tasks})
+        setTasks({
+            ...tasks, [todolistID]:
+                [{id: v1(), title: title, isDone: false}, ...tasks[todolistID]]
+        })
     }
 
     function changeStatus(taskId: string, isDone: boolean, todolistID: string) {
-        let task = tasks[todolistID].find(t => t.id === taskId);
-        if (task) {
-            task.isDone = isDone;
-        }
-        setTodolists([...todolists])
-        setTasks({...tasks});
+        tasks[todolistID] = tasks[todolistID].map(t => taskId === t.id ? {...t, isDone: isDone} : t)
+        setTasks({...tasks})
+        // setTasks({...tasks, [todolistID]: tasks[todolistID].map(t => t.id === taskId ? {...t, isDone: isDone} : t)})
     }
 
     function changeFilter(todolistID: string, value: FilterValuesType) {
@@ -86,10 +87,10 @@ function App() {
                         filter={td.filter}
                     />
                 )
-            })}
-
+            })
+            }
         </div>
     );
 }
 
-export default App;
+export default App

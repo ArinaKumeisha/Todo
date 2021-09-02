@@ -1,6 +1,7 @@
-import React, {ChangeEvent, KeyboardEvent, useState} from 'react';
+import React, {ChangeEvent, useState} from 'react';
 import {FilterValuesType} from './App';
 import Buttons from "./components/Button/Buttons";
+import Input from "./components/Input/Input";
 
 
 export type TaskType = {
@@ -21,9 +22,12 @@ type PropsType = {
 }
 
 export const Todolist = React.memo((props: PropsType) => {
+    const universalFilterHandler = (value: FilterValuesType) => {
+        props.changeFilter(props.todolistID, value)
+    }
+
     let [title, setTitle] = useState("")
     let [error, setError] = useState<string | null>(null)
-
     const addTask = () => {
         if (title.trim() !== "") {
             props.addTask(title.trim(), props.todolistID);
@@ -32,40 +36,35 @@ export const Todolist = React.memo((props: PropsType) => {
             setError("Title is required");
         }
     }
-    const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-        setTitle(e.currentTarget.value)
-    }
-    const onKeyPressHandler = (e: KeyboardEvent<HTMLInputElement>) => {
-        setError(null);
-        if (e.charCode === 13) {
-            addTask();
-        }
-    }
-
     return <div>
         <h3>{props.title}</h3>
-        <div>
-            <input value={title}
-                   onChange={onChangeHandler}
-                   onKeyPress={onKeyPressHandler}
-                   className={error ? "error" : ""}
-            />
-            <button onClick={addTask}>+</button>
-            {error && <div className="error-message">{error}</div>}
+        <div className={'both'}>
+            <Input
+                title={title}
+                todolistID={props.todolistID}
+                setTitle={setTitle}
+                addTask={addTask}
+                setError={setError}
+                error={error}/>
+            <Buttons
+                callback={addTask}
+                name={'+'}/>
         </div>
         <ul>
             {
                 props.tasks.map(t => {
-                    const onClickHandler = () => props.removeTask(t.id, props.todolistID)
+                    const removeHandler = () => props.removeTask(t.id, props.todolistID)
                     const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
                         props.changeTaskStatus(t.id, e.currentTarget.checked, props.todolistID);
                     }
                     return <li key={t.id} className={t.isDone ? "is-done" : ""}>
-                        <input type="checkbox"
-                               onChange={onChangeHandler}
-                               checked={t.isDone}/>
+                        <input
+                            type="checkbox"
+                            onChange={onChangeHandler}
+                            checked={t.isDone}/>
                         <span>{t.title}</span>
-                        <button onClick={onClickHandler}>x</button>
+
+                        <Buttons callback={removeHandler} name={'X'}/>
                     </li>
                 })
             }
@@ -73,20 +72,18 @@ export const Todolist = React.memo((props: PropsType) => {
 
         <div>
             <Buttons
-                name="all"
-                callback={props.changeFilter}
-                todolistID={props.todolistID}
+                name={'all'}
+                callback={() => universalFilterHandler('all')}
                 filter={props.filter}/>
             <Buttons
-                name="active"
-                callback={props.changeFilter}
-                todolistID={props.todolistID}
+                name={'completed'}
+                callback={() => universalFilterHandler('completed')}
                 filter={props.filter}/>
             <Buttons
-                name="completed"
-                callback={props.changeFilter}
-                todolistID={props.todolistID}
+                name={'active'}
+                callback={() => universalFilterHandler('active')}
                 filter={props.filter}/>
+
         </div>
     </div>
 })
